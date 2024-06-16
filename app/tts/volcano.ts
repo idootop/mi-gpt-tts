@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { Readable } from "stream";
 import WebSocket from "ws";
 import * as zlib from "zlib";
-import { TTSProvider, TTSSpeaker, kTTSDefaultText } from ".";
+import { TTSProvider, TTSSpeaker, kTTSDefaultText } from "./type";
 
 // 火山引擎 TTS 音色列表：https://www.volcengine.com/docs/6561/97465
 const kVolcanoTTSSpeakers: TTSSpeaker[] = [

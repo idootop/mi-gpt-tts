@@ -21,6 +21,7 @@ dist
 .DS_Store
 *.pem
 temp
+test.mp3
 
 # debug
 npm-debug.log*

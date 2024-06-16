@@ -8,7 +8,7 @@ async function main() {
     text: "你好，很高兴认识你。",
   });
   if (audioBuffer) {
-    await writeFile("hello.mp3", audioBuffer);
+    await writeFile("test.mp3", audioBuffer);
   }
 }
 

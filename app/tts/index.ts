@@ -1,5 +1,11 @@
 import { Readable } from "stream";
 import { kVolcanoTTS } from "./volcano";
+import {
+  CurrentTTSSpeaker,
+  TTSProvider,
+  TTSSpeaker,
+  kTTSDefaultText,
+} from "./type";
 
 /**
  * 此处注册 TTS 服务提供商
@@ -12,8 +18,6 @@ export const kTTSSpeakers = kTTSProviders.reduce(
   (pre, s) => [...pre, ...s.speakers],
   [] as TTSSpeaker[]
 );
-
-export const kTTSDefaultText = "你好，很高兴认识你！";
 
 export async function streamTTS(
   responseStream: Readable,
@@ -75,34 +79,3 @@ const findSpeaker = (speakerNameOrId?: string): CurrentTTSSpeaker => {
   });
   return provider ? { tts: provider.tts, speaker } : kDefaultSpeaker;
 };
-
-type TTSBuilder = (
-  responseStream: Readable,
-  options?: { text?: string; speaker?: string }
-) => Promise<any>;
-
-export interface TTSSpeaker {
-  /**
-   * 音色名称
-   */
-  name?: string;
-  /**
-   * 音色性别分类，男女（可选）
-   */
-  gender?: string;
-  /**
-   * 音色标识
-   */
-  speaker: string;
-}
-
-export interface TTSProvider {
-  name: string;
-  speakers: TTSSpeaker[];
-  tts: TTSBuilder;
-}
-
-export interface CurrentTTSSpeaker {
-  speaker: string;
-  tts: TTSBuilder;
-}
