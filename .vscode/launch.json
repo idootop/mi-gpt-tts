@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Test",
+      "type": "node",
+      "request": "launch",
+      "args": ["${workspaceFolder}/tests/index.ts"],
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
+      "cwd": "${workspaceRoot}",
+      "envFile": "${workspaceFolder}/.env",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Runner",
+      "type": "node",
+      "request": "launch",
+      "args": ["${workspaceFolder}/server.js"],
+      "cwd": "${workspaceRoot}",
+      "envFile": "${workspaceFolder}/.env",
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
+}

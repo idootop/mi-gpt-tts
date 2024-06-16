@@ -1,0 +1,27 @@
+{
+  "name": "mi-gpt-tts",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "server": "node server.js",
+    "start": "next build && next start"
+  },
+  "dependencies": {
+    "next": "14.0.4",
+    "tsup": "^8.1.0",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "@types/react": "18.2.56",
+    "@types/ws": "^8.5.10",
+    "tsx": "^4.15.5",
+    "typescript": "^5"
+  }
+}
