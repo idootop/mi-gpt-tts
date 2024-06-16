@@ -12,7 +12,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "typescript.tsdk": "node_modules/.pnpm/typescript@5.0.3/node_modules/typescript/lib",
   "search.exclude": {
     "**/.git": true,
     "**/node_modules": true,

@@ -94,27 +94,24 @@ git clone https://github.com/idootop/mi-gpt-tts.git
 cd mi-gpt-tts
 
 # 安装依赖
-pnpm install
+npm install
+
+# 构建项目
+npm run build
 
 # 启动项目
-pnpm start
+npm run start
 ```
 
 ### 本地调试
 
 在 VS Code 中打开本项目，然后在 `tests/index.ts` 配置好你想要调试的模块，然后按 F5 即可下断调试代码。
 
-或者，你可以使用 `pnpm dev` 命令启动 dev server 调试相关接口，支持热更新。
-
 ### 构建镜像
 
 此项目默认支持 `linux/amd64`, `linux/arm64` 和 `linux/arm32/v7`，可使用以下命令构建指定平台的镜像：
 
 ```shell
-# 构建产物
-pnpm build
-
-# 构建镜像
 docker build --platform linux/arm/v7 -t mi-gpt-tts .
 ```
 

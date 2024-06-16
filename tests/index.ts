@@ -1,4 +1,4 @@
-import { volcanoTTS } from "@/app/tts/volcano";
+import { volcanoTTS } from "@/src/tts/volcano";
 import { writeFile } from "fs/promises";
 import { Readable } from "stream";
 
