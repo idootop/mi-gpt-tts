@@ -10,13 +10,18 @@
 
 然后，在产品列表搜索「语音合成」，选择「语音技术」，创建应用，勾选「语音合成」。
 
-> 注意：账号注册成功之后，请先在个人中心完成实名认证，然后才能创建语音合成应用。
+<details>
+<summary>👉 查看教程</summary>
 
 ![](https://raw.githubusercontent.com/idootop/mi-gpt-tts/main/screenshots/1.search.jpg)
 
 ![](https://raw.githubusercontent.com/idootop/mi-gpt-tts/main/screenshots/2.create.jpg)
 
 ![](https://raw.githubusercontent.com/idootop/mi-gpt-tts/main/screenshots/3.token.jpg)
+
+</details>
+
+> 注意：账号注册成功之后，请先在个人中心完成实名认证，然后才能创建语音合成应用。
 
 ### 2. 配置环境变量
 
@@ -40,7 +45,7 @@
 docker run -d --env-file $(pwd)/.env -p 4321:3000 idootop/mi-gpt-tts:latest
 ```
 
-启动成功后，访问 `http://[你的公网/局域网地址]:4321/api/tts.mp3` 即可查看语音合成效果（hello world）
+启动成功后，访问 `http://[你的公网/局域网地址]:4321/api/tts.mp3` 即可查看语音合成效果。
 
 ### 4. 修改 MiGPT 默认 TTS 引擎
 
