@@ -3,11 +3,10 @@ import { parse } from "url";
 import apiSpeakers from "./api/speakers.js";
 import apiTTS from "./api/tts.mp3.js";
 import { createReadStream, existsSync } from "fs";
-import { debug } from "./src/debug.js";
 
 const server = http.createServer((req, res) => {
   const { pathname } = parse(req.url);
-  debug("🔥 " + decodeURI(req.url));
+  console.log("🔥 " + decodeURI(req.url));
   if (pathname.startsWith("/api/speakers")) {
     apiSpeakers(req, res);
   } else if (pathname.startsWith("/api/tts.mp3")) {
