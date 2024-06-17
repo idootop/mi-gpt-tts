@@ -3,6 +3,7 @@ import { Readable } from "stream";
 import WebSocket from "ws";
 import * as zlib from "zlib";
 import { TTSProvider, TTSSpeaker, kTTSDefaultText } from "./type";
+import { debug } from "../debug";
 
 // 火山引擎 TTS 音色列表：https://www.volcengine.com/docs/6561/97465
 const kVolcanoTTSSpeakers: TTSSpeaker[] = [
@@ -464,7 +465,7 @@ export async function volcanoTTS(
     let audioBuffer = new Uint8Array();
 
     const onError = (err: any) => {
-      console.log(requestId, "❌ Generate failed!");
+      debug(requestId, "❌ Generate failed!");
       responseStream.destroy(err);
       reject(err);
     };
@@ -486,14 +487,14 @@ export async function volcanoTTS(
           return;
         }
         if (audioData.length > 0) {
-          // console.log(requestId, "✅ Received audio bytes: ", audioData.length);
+          // debug(requestId, "✅ Received audio bytes: ", audioData.length);
           responseStream.push(audioData);
           const newData = new Uint8Array(audioBuffer.length + audioData.length);
           newData.set(audioBuffer, 0);
           newData.set(audioData, audioBuffer.length);
           audioBuffer = newData;
           if (messageSpecificFlags === 3) {
-            console.log(requestId, "✅ Done: ", audioBuffer.length);
+            debug(requestId, "✅ Done: ", audioBuffer.length);
             ws.close();
           }
           return;
@@ -501,7 +502,7 @@ export async function volcanoTTS(
       });
 
       ws.on("error", (err) => {
-        console.log(requestId, "❌ WebSocket error:", err);
+        debug(requestId, "❌ WebSocket error:", err);
         onError(err);
       });
 
@@ -510,7 +511,7 @@ export async function volcanoTTS(
         resolve(audioBuffer);
       });
     } catch (err) {
-      console.log(requestId, "❌ Unknown error:", err);
+      debug(requestId, "❌ Unknown error:", err);
       onError(err);
     }
   });
@@ -537,14 +538,11 @@ function parseAudioData(requestId: string, responseBuffer: Buffer) {
     if (messageCompression === 1) {
       errorMessage = zlib.gunzipSync(errorMessage);
     }
-    console.log(requestId, `❌ Error code: ${errorCode}`);
-    console.log(
-      requestId,
-      `❌ Error message: ${errorMessage.toString("utf-8")}`
-    );
+    debug(requestId, `❌ Error code: ${errorCode}`);
+    debug(requestId, `❌ Error message: ${errorMessage.toString("utf-8")}`);
     return "error";
   } else {
-    console.log(requestId, "❌ Unknown message");
+    debug(requestId, "❌ Unknown message");
     return "unknown";
   }
 }
@@ -554,7 +552,7 @@ const getVolcanoConfig = () => {
     !process.env.VOLCANO_TTS_APP_ID ||
     !process.env.VOLCANO_TTS_ACCESS_TOKEN
   ) {
-    console.log(
+    debug(
       "❌ 找不到火山引擎 TTS 环境变量：VOLCANO_TTS_APP_ID、VOLCANO_TTS_ACCESS_TOKEN"
     );
     return;
