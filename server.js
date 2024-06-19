@@ -4,6 +4,14 @@ import apiSpeakers from "./api/speakers.js";
 import apiTTS from "./api/tts.mp3.js";
 import { createReadStream, existsSync } from "fs";
 
+const exists = (path) => {
+  try {
+    return existsSync(path);
+  } catch {
+    return false;
+  }
+};
+
 const server = http.createServer((req, res) => {
   const { pathname } = parse(req.url);
   console.log("🔥 " + decodeURI(req.url));
@@ -11,7 +19,7 @@ const server = http.createServer((req, res) => {
     apiSpeakers(req, res);
   } else if (pathname.startsWith("/api/tts.mp3")) {
     apiTTS(req, res);
-  } else if (existsSync(`public/${pathname}`)) {
+  } else if (exists(`public/${pathname}`)) {
     res.writeHead(200, {
       "Transfer-Encoding": "chunked",
       "Content-Type": "audio/mpeg",
