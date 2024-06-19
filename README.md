@@ -47,6 +47,8 @@ docker run -d --env-file $(pwd)/.env -p 4321:3000 idootop/mi-gpt-tts:latest
 
 启动成功后，访问 `http://[你的公网/局域网地址]:4321/api/tts.mp3` 即可查看语音合成效果。
 
+> 注意：如果你是通过 Node.js 本地启动本项目，则默认服务端口为 `3000`。
+
 ### 4. 修改 MiGPT 默认 TTS 引擎
 
 你可以通过以下步骤，切换 `MiGPT` 使用的 TTS 引擎：
@@ -69,6 +71,8 @@ export default {
 ```
 
 如果你的 `MiGPT-TTS` 服务与小爱音箱处在同一局域网下，那么也可以使用局域网地址。
+
+> 注意：本项目中的部分音色名称，与火山引擎官方文档中的名称并不一致，完整的音色列表和名称以此处为准：[volcano.ts](https://github.com/idootop/mi-gpt-tts/blob/main/src/tts/volcano.ts)
 
 ### 5. （可选）更新 MiGPT 提示音效链接
 
