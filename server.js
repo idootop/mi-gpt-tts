@@ -2,14 +2,16 @@ import http from "http";
 import { parse } from "url";
 import apiSpeakers from "./api/speakers.js";
 import apiTTS from "./api/tts.mp3.js";
-import { createReadStream, existsSync } from "fs";
+import { createReadStream, stat } from "fs";
 
 const exists = (path) => {
-  try {
-    return existsSync(path);
-  } catch {
-    return false;
-  }
+  let isFile = false;
+  stat(path, (err, stats) => {
+    if (!err && stats.isFile()) {
+      isFile = true;
+    }
+  });
+  return isFile;
 };
 
 const server = http.createServer((req, res) => {
