@@ -15,7 +15,7 @@ const kVolcanoTTSSpeakers: TTSSpeaker[] = [
     speaker: "BV700_streaming",
   },
   {
-    name: "灿灿2",
+    name: "灿灿二",
     gender: "女",
     speaker: "BV700_V2_streaming",
   },
@@ -25,7 +25,7 @@ const kVolcanoTTSSpeakers: TTSSpeaker[] = [
     speaker: "BV406_streaming",
   },
   {
-    name: "梓梓2",
+    name: "梓梓二",
     gender: "女",
     speaker: "BV406_V2_streaming",
   },
@@ -35,7 +35,7 @@ const kVolcanoTTSSpeakers: TTSSpeaker[] = [
     speaker: "BV407_streaming",
   },
   {
-    name: "燃燃2",
+    name: "燃燃二",
     gender: "女",
     speaker: "BV407_V2_streaming",
   },
@@ -50,7 +50,7 @@ const kVolcanoTTSSpeakers: TTSSpeaker[] = [
     speaker: "BV701_streaming",
   },
   {
-    name: "擎苍2",
+    name: "擎苍二",
     gender: "女",
     speaker: "BV701_V2_streaming",
   },
@@ -60,7 +60,7 @@ const kVolcanoTTSSpeakers: TTSSpeaker[] = [
     speaker: "BV001_streaming",
   },
   {
-    name: "通用女声2",
+    name: "通用女声二",
     gender: "女",
     speaker: "BV001_V2_streaming",
   },
@@ -465,8 +465,9 @@ export async function volcanoTTS(
 
     const onError = (err: any) => {
       console.log(requestId, "❌ Generate failed!");
-      responseStream.destroy(err);
-      reject(err);
+      responseStream.push("404");
+      responseStream.push(null);
+      reject();
     };
 
     try {
@@ -538,7 +539,10 @@ function parseAudioData(requestId: string, responseBuffer: Buffer) {
       errorMessage = zlib.gunzipSync(errorMessage);
     }
     console.log(requestId, `❌ Error code: ${errorCode}`);
-    console.log(requestId, `❌ Error message: ${errorMessage.toString("utf-8")}`);
+    console.log(
+      requestId,
+      `❌ Error message: ${errorMessage.toString("utf-8")}`
+    );
     return "error";
   } else {
     console.log(requestId, "❌ Unknown message");
