@@ -90,11 +90,16 @@ AUDIO_ERROR=http://[你的公网/局域网地址]:[端口号]/error.wav
 
 **Q：开启第三方 TTS 后小爱音箱不说话了，而且 TTS 控制台没有收到请求**
 
-请在小爱音箱使用的 Wi-Fi 下面用浏览器打开下面的链接：
+这种情况有两种可能：
 
-`http://[你的公网/局域网地址]:4321/api/tts.mp3`
+- 你的小爱音箱连接到的 Wi-Fi 网络无法正常访问你的 TTS 服务接口
+- 假如你使用了内外穿透或者反向代理等服务，你的 TTS 服务接口返回的 headers 可能会被修改，丢掉了某些关键 headers
 
-此链接打开后，检查是否能正常播放一段音频，如果不能说明你的小爱音箱无法访问到你设置的 `TTS_BASE_URL`，故无法在小爱音箱上正常播放 TTS 音频链接。
+如果你的 TTS 服务控制台能收到 MiGPT 的 TTS 请求，说明第 2 种情况的可能性比较大；如果没有收到任何请求，说明是第一种情况。相关 [issue](https://github.com/idootop/mi-gpt/issues/107)
+
+你可以用小爱音箱使用的 Wi-Fi 在浏览器打开链接：`http://[你的公网/局域网地址]:4321/api/tts.mp3`
+
+如果不能正常访问说明你的小爱音箱无法访问到你设置的 `TTS_BASE_URL`，故无法在小爱音箱上正常播放 TTS 音频链接。
 
 另外，检查上面网络请求返回的 Response 中是否包含以下 headers，如有缺失请配置你的反向代理/内网穿透服务，保留相关 headers。
 
@@ -106,6 +111,8 @@ response.writeHead(200, {
 ```
 
 **Q：语音合成失败，提示 extract request resource id: get resource id: access denied**
+
+以下是一些可能的原因，相关 [issue](https://github.com/idootop/mi-gpt/issues/110)
 
 1. 检查你在火山引擎开通的服务是否为“语音合成”，而非“音色转换”、“精品长文本声音合成”等服务
 2. 检查你的 Cluster ID 是否为 `volcano_tts`
