@@ -86,6 +86,39 @@ AUDIO_ACTIVE=http://[你的公网/局域网地址]:[端口号]/active.wav
 AUDIO_ERROR=http://[你的公网/局域网地址]:[端口号]/error.wav
 ```
 
+## 💬 常见问题
+
+**Q：开启第三方 TTS 后小爱音箱不说话了，而且 TTS 控制台没有收到请求**
+
+请在小爱音箱使用的 Wi-Fi 下面用浏览器打开下面的链接：
+
+`http://[你的公网/局域网地址]:4321/api/tts.mp3`
+
+此链接打开后，检查是否能正常播放一段音频，如果不能说明你的小爱音箱无法访问到你设置的 `TTS_BASE_URL`，故无法在小爱音箱上正常播放 TTS 音频链接。
+
+另外，检查上面网络请求返回的 Response 中是否包含以下 headers，如有缺失请配置你的反向代理/内网穿透服务，保留相关 headers。
+
+```js
+response.writeHead(200, {
+  "Transfer-Encoding": "chunked",
+  "Content-Type": "audio/mp3",
+});
+```
+
+**Q：语音合成失败，提示 extract request resource id: get resource id: access denied**
+
+1. 检查你在火山引擎开通的服务是否为“语音合成”，而非“音色转换”、“精品长文本声音合成”等服务
+2. 检查你的 Cluster ID 是否为 `volcano_tts`
+3. 检查是否已经开启**试用**音色，未开启使用将无法使用相关音色
+
+**Q：TTS 服务经常崩溃退出，比如 AI 回答比较长时**
+
+请将 TTS 服务镜像/代码更新到 v1.2.0 版本及以上。
+
+**Q：AI 回答内容比较长时，小爱音箱没有回复**
+
+火山语音合成功能的单次文字长度上限为 1024 字节，超出后将抛出异常。目前暂未对长文本场景做适配。
+
 ## 🛠️ 本地开发
 
 如果你想要修改代码，添加对更多 TTS 引擎的支持（比如 ChatTTS、OpenAI 等），可以参考以下本地开发教程。
