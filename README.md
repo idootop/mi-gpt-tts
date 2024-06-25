@@ -175,6 +175,8 @@ docker run -d --env-file $(pwd)/.env -p 4321:3000 mi-gpt-tts
 
 其中，请求参数 `speaker` 为指定音色名称或标识，可选。
 
+> 注意：小爱音箱在访问音频链接时，可能会将请求链接中的 `&text=` 转义成 `+text=`，你需要在 Server 端手动修复请求参数。相关 [issue](https://github.com/idootop/mi-gpt/issues/120)
+
 ### GET /api/speakers
 
 获取音色列表
