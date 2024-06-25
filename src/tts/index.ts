@@ -56,7 +56,7 @@ const initDefaultSpeaker = () => {
       kDefaultSpeaker = { tts: provider.tts, speaker };
     }
   }
-  kDefaultSpeaker = {
+  kDefaultSpeaker ??= {
     tts: kTTSProviders[0].tts,
     speaker: kTTSProviders[0].speakers[0].speaker,
   };
