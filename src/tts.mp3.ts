@@ -3,9 +3,7 @@ import { streamTTS } from "./tts";
 
 export default async function handler(request, response) {
   const options: any = {};
-  const url = new URL(
-    "http://127.0.0.1" + request.url.replace("+text=", "&text=")
-  );
+  const url = new URL("http://127.0.0.1" + request.url);
   for (const [key, value] of url.searchParams.entries()) {
     options[key] = value;
   }
