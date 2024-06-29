@@ -1,27 +1,29 @@
 import { Readable } from "stream";
-import { kVolcanoTTS } from "./volcano";
+import { kOpenAITTS } from "./openai";
 import {
   CurrentTTSSpeaker,
+  kTTSDefaultText,
   TTSProvider,
   TTSSpeaker,
-  kTTSDefaultText,
 } from "./type";
+import { kVolcanoTTS } from "./volcano";
 
 /**
  * 此处注册 TTS 服务提供商
  */
 export const kTTSProviders: TTSProvider[] = [
   kVolcanoTTS, // 火山引擎，官方文档地址：https://www.volcengine.com/docs/6561/79817
+  kOpenAITTS, // OpenAI引擎，官方文档地址：https://platform.openai.com
 ];
 
 export const kTTSSpeakers = kTTSProviders.reduce(
   (pre, s) => [...pre, ...s.speakers],
-  [] as TTSSpeaker[]
+  [] as TTSSpeaker[],
 );
 
 export async function streamTTS(
   responseStream: Readable,
-  options?: { text?: string; speaker?: string }
+  options?: { text?: string; speaker?: string },
 ) {
   const { text, speaker } = options ?? {};
   const service = findSpeaker(speaker);
@@ -44,8 +46,8 @@ const initDefaultSpeaker = () => {
     const provider = kTTSProviders.find((e) => {
       const sp = e.speakers.find(
         (s) =>
-          s.name === process.env.TTS_DEFAULT_SPEAKER ||
-          s.speaker === process.env.TTS_DEFAULT_SPEAKER
+          s.name === process.env.TTS_DEFAULT_SPEAKER
+          || s.speaker === process.env.TTS_DEFAULT_SPEAKER,
       );
       if (sp) {
         speaker = sp?.speaker;
@@ -70,7 +72,7 @@ const findSpeaker = (speakerNameOrId?: string): CurrentTTSSpeaker => {
   let speaker = kDefaultSpeaker.speaker;
   const provider = kTTSProviders.find((e) => {
     const sp = e.speakers.find(
-      (s) => s.name === speakerNameOrId || s.speaker === speakerNameOrId
+      (s) => s.name === speakerNameOrId || s.speaker === speakerNameOrId,
     );
     if (sp) {
       speaker = sp?.speaker;
