@@ -5,7 +5,7 @@ export const createStreamHandler = (responseStream: Readable) => {
   let audioBuffer = new Uint8Array();
   const requestId = randomUUID().substring(0, 8);
   let resolve, reject;
-  const result = new Promise<Uint8Array>((res, rej) => {
+  const result = new Promise<Uint8Array | null>((res, rej) => {
     resolve = res;
     reject = rej;
   });
@@ -21,7 +21,8 @@ export const createStreamHandler = (responseStream: Readable) => {
   const end = () => {
     console.log(requestId, "✅ Done: ", audioBuffer.length);
     responseStream.push(null);
-    resolve(audioBuffer);
+
+    resolve(audioBuffer.length < 1000 ? null : audioBuffer);
   };
 
   const error = (err: any, msg = "Something went wrong") => {

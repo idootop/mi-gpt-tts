@@ -6,7 +6,7 @@ import { kEdgeTTS } from "./tts/edge";
 import { kOpenAI } from "./tts/openai";
 import { kVolcanoTTS } from "./tts/volcano";
 
-export type { TTSConfig } from "./common/type";
+export type { TTSConfig, TTSOptions } from "./common/type";
 
 /**
  * 此处注册 TTS 服务提供商
@@ -25,12 +25,14 @@ export const kTTSSpeakers = kTTSProviders.reduce(
 export async function tts(options: TTSOptions) {
   const { text, speaker, stream, defaultSpeaker, ...rest } = options;
   const provider = findTTSProvider(speaker, defaultSpeaker);
-  return provider.tts({
-    ...rest,
-    speaker: provider.speaker,
-    text: text || kTTSDefaultText,
-    stream: stream || new Readable({ read() {} }),
-  });
+  return provider
+    .tts({
+      ...rest,
+      speaker: provider.speaker,
+      text: text || kTTSDefaultText,
+      stream: stream || new Readable({ read() {} }),
+    })
+    .catch(() => null);
 }
 
 export function createTTS(config: TTSConfig) {

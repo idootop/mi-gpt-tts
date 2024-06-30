@@ -50,8 +50,9 @@ async function main() {
     text: "你好，很高兴认识你！",
     speaker: "云希", // 音色名称
   });
-
-  await writeFile("output.mp3", audioBuffer);
+  if (audioBuffer) {
+    await writeFile("output.mp3", audioBuffer);
+  }
 }
 
 main();

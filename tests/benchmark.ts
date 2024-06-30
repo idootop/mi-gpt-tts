@@ -1,4 +1,21 @@
-import { tts } from "@/src";
+import { createTTS } from "@/src";
+
+const tts = createTTS({
+  defaultSpeaker: process.env.TTS_DEFAULT_SPEAKER,
+  volcano: {
+    appId: process.env.VOLCANO_TTS_APP_ID!,
+    accessToken: process.env.VOLCANO_TTS_ACCESS_TOKEN!,
+    userId: process.env.VOLCANO_TTS_USER_ID,
+  },
+  edge: {
+    trustedToken: process.env.EDGE_TTS_TRUSTED_TOKEN!,
+  },
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY!,
+    model: process.env.OPENAI_TTS_MODEL,
+    baseUrl: process.env.OPENAI_BASE_URL,
+  },
+});
 
 export async function benchmark(options?: {
   speaker?: string;
@@ -10,10 +27,8 @@ export async function benchmark(options?: {
   const text = generateText(textLength);
   const final = await withTimeUsage(async () => {
     for (let i = 0; i < times; i++) {
-      const res = await withTimeUsage(async () => {
-        return tts({ text, speaker }).catch(() => {});
-      });
-      if ((res.data?.byteLength ?? 0) > 10) {
+      const res = await withTimeUsage(() => tts({ text, speaker }));
+      if (res.data) {
         result = res.data;
         console.log(
           `🔥 ${speaker} ${i + 1} 用时：${(res.time / 1000).toFixed(2)}s`

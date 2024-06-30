@@ -34,7 +34,7 @@ export type TTSBuilder = (
     text: string;
     speaker: string;
   }
-) => Promise<Uint8Array | undefined>;
+) => Promise<Uint8Array | null>;
 
 export type TTSOptions = TTSConfig & {
   stream?: Readable;

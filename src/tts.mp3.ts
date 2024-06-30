@@ -28,8 +28,7 @@ export default async function handler(request, response) {
   const audioStream = new Readable({ read() {} });
   options.stream = audioStream;
 
-  // 语音合成
-  tts(options).catch(() => {});
+  tts(options); // 语音合成
 
   response.writeHead(200, {
     "Transfer-Encoding": "chunked",

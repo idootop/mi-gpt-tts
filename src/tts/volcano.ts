@@ -431,7 +431,7 @@ export const volcanoTTS: TTSBuilder = async ({
 }) => {
   const request: any = getVolcanoConfig(volcano);
   if (!request) {
-    return; // 找不到火山引擎 TTS 环境变量
+    return null; // 找不到火山引擎 TTS 环境变量
   }
 
   let requestId: string = randomUUID();

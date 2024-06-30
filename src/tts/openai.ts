@@ -48,7 +48,7 @@ export const openaiTTS: TTSBuilder = async ({
 
   if (!key) {
     console.log("❌ 找不到 OpenAI TTS 环境变量：OPENAI_API_KEY");
-    return;
+    return null;
   }
 
   const streamHandler = createStreamHandler(responseStream);
