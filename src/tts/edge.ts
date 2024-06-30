@@ -74,7 +74,7 @@ export const edgeTTS: TTSBuilder = async ({
   speaker,
   stream: responseStream,
 }) => {
-  const token = edge?.trustedToken ?? process.env.EDGE_TTS_TRUSTED_TOKEN;
+  const token = edge?.trustedToken;
   if (!token) {
     console.log("❌ 找不到微软必应 TTS 环境变量：EDGE_TTS_TRUSTED_TOKEN");
     return;

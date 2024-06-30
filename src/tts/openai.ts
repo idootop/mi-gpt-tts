@@ -42,12 +42,9 @@ export const openaiTTS: TTSBuilder = async ({
   speaker,
   stream: responseStream,
 }) => {
-  const key = openai?.apiKey ?? process.env.OPENAI_API_KEY;
-  const model = openai?.model ?? process.env.OPENAI_TTS_MODEL ?? "tts-1";
-  const baseUrl =
-    openai?.baseUrl ??
-    process.env.OPENAI_BASE_URL ??
-    "https://api.openai.com/v1";
+  const key = openai?.apiKey;
+  const model = openai?.model ?? "tts-1";
+  const baseUrl = openai?.baseUrl ?? "https://api.openai.com/v1";
 
   if (!key) {
     console.log("❌ 找不到 OpenAI TTS 环境变量：OPENAI_API_KEY");

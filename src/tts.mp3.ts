@@ -1,5 +1,22 @@
 import { Readable } from "stream";
-import { tts } from ".";
+import { createTTS } from ".";
+
+const tts = createTTS({
+  defaultSpeaker: process.env.TTS_DEFAULT_SPEAKER,
+  volcano: {
+    appId: process.env.VOLCANO_TTS_APP_ID!,
+    accessToken: process.env.VOLCANO_TTS_ACCESS_TOKEN!,
+    userId: process.env.VOLCANO_TTS_USER_ID,
+  },
+  edge: {
+    trustedToken: process.env.EDGE_TTS_TRUSTED_TOKEN!,
+  },
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY!,
+    model: process.env.OPENAI_TTS_MODEL,
+    baseUrl: process.env.OPENAI_BASE_URL,
+  },
+});
 
 export default async function handler(request, response) {
   const options: any = {};
@@ -10,6 +27,8 @@ export default async function handler(request, response) {
 
   const audioStream = new Readable({ read() {} });
   options.stream = audioStream;
+
+  // 语音合成
   tts(options).catch(() => {});
 
   response.writeHead(200, {

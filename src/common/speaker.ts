@@ -5,9 +5,10 @@ import { CurrentTTSSpeaker, TTSSpeaker } from "./type";
  * 根据 speaker 标识查找对应的 TTS 音色，支持根据音色名称和标识查找
  */
 export const findTTSProvider = (
-  speakerNameOrId?: string
+  speakerNameOrId?: string,
+  defaultSpeaker?: string
 ): CurrentTTSSpeaker => {
-  initDefaultSpeaker();
+  initDefaultSpeaker(defaultSpeaker);
   let speaker = kDefaultSpeaker.speaker;
   const provider = kTTSProviders.find((e) => {
     const sp = e.speakers.find(
@@ -35,17 +36,15 @@ export const findSpeaker = (speakers: TTSSpeaker[], speaker?: string) => {
  * 初始化默认 TTS 音色
  */
 let kDefaultSpeaker: CurrentTTSSpeaker;
-const initDefaultSpeaker = () => {
+const initDefaultSpeaker = (defaultSpeaker?: string) => {
   if (kDefaultSpeaker) {
     return;
   }
-  if (process.env.TTS_DEFAULT_SPEAKER) {
+  if (defaultSpeaker) {
     let speaker = "";
     const provider = kTTSProviders.find((e) => {
       const sp = e.speakers.find(
-        (s) =>
-          s.name === process.env.TTS_DEFAULT_SPEAKER ||
-          s.speaker === process.env.TTS_DEFAULT_SPEAKER
+        (s) => s.name === defaultSpeaker || s.speaker === defaultSpeaker
       );
       if (sp) {
         speaker = sp?.speaker;

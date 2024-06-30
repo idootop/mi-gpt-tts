@@ -1,13 +1,13 @@
 import { Readable } from "stream";
 
 export interface VolcanoConfig {
-  appId?: string;
-  accessToken?: string;
+  appId: string;
+  accessToken: string;
   userId?: string;
 }
 
 export interface EdgeConfig {
-  trustedToken?: string;
+  trustedToken: string;
 }
 
 export interface OpenAIConfig {
@@ -17,6 +17,12 @@ export interface OpenAIConfig {
 }
 
 export interface TTSConfig {
+  /**
+   * 默认音色
+   *
+   * 当指定的音色不存在时，会 fallback 到默认音色
+   */
+  defaultSpeaker?: string;
   volcano?: VolcanoConfig;
   edge?: EdgeConfig;
   openai?: OpenAIConfig;
@@ -29,6 +35,12 @@ export type TTSBuilder = (
     speaker: string;
   }
 ) => Promise<Uint8Array | undefined>;
+
+export type TTSOptions = TTSConfig & {
+  stream?: Readable;
+  text?: string;
+  speaker?: string;
+};
 
 export interface TTSSpeaker {
   /**

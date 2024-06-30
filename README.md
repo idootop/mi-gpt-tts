@@ -17,17 +17,40 @@ npm install mi-gpt-tts
 示例代码：
 
 ```typescript
-import { tts } from "mi-gpt-tts";
+import { createTTS, kTTSSpeakers } from "mi-gpt-tts";
 import { writeFile } from "fs/promises";
 
+const tts = createTTS({
+  // 默认音色
+  defaultSpeaker: process.env.TTS_DEFAULT_SPEAKER,
+  // 火山引擎
+  volcano: {
+    appId: process.env.VOLCANO_TTS_APP_ID,
+    accessToken: process.env.VOLCANO_TTS_ACCESS_TOKEN,
+    userId: process.env.VOLCANO_TTS_USER_ID,
+  },
+  // 微软必应
+  edge: {
+    trustedToken: process.env.EDGE_TTS_TRUSTED_TOKEN,
+  },
+  // OpenAI
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY,
+    model: process.env.OPENAI_TTS_MODEL,
+    baseUrl: process.env.OPENAI_BASE_URL,
+  },
+});
+
 async function main() {
+  // 获取所有的音色列表
+  console.log(kTTSSpeakers);
+
+  // 语音合成
   const audioBuffer = await tts({
-    speaker: "云希",
     text: "你好，很高兴认识你！",
-    edge: {
-      trustedToken: "6A5A-xxxx",
-    },
+    speaker: "云希", // 音色名称
   });
+
   await writeFile("output.mp3", audioBuffer);
 }
 

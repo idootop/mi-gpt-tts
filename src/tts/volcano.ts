@@ -524,9 +524,9 @@ function parseAudioData(
 }
 
 const getVolcanoConfig = (volcano?: VolcanoConfig) => {
-  const appid = volcano?.appId ?? process.env.VOLCANO_TTS_APP_ID;
-  const token = volcano?.accessToken ?? process.env.VOLCANO_TTS_ACCESS_TOKEN;
-  const uid = volcano?.userId ?? process.env.VOLCANO_TTS_USER_ID ?? "666";
+  const appid = volcano?.appId;
+  const token = volcano?.accessToken;
+  const uid = volcano?.userId ?? "666";
   if (!appid || !token) {
     console.log(
       "❌ 找不到火山引擎 TTS 环境变量：VOLCANO_TTS_APP_ID、VOLCANO_TTS_ACCESS_TOKEN"
