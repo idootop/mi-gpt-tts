@@ -1,6 +1,6 @@
 {
   "name": "mi-gpt-tts",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "type": "module",
   "license": "MIT",
   "description": "适用于 MiGPT 的 TTS 模块，支持火山引擎、微软必应、OpenAI 等 TTS 服务。",
@@ -41,5 +41,13 @@
     "name": "Del Wang",
     "email": "hello@xbox.work",
     "url": "https://github.com/idootop"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs",
+    "default": "./dist/index.js"
   }
 }
