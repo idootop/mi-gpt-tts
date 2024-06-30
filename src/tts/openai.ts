@@ -61,9 +61,9 @@ export async function openAITTS(
     responseStream.push(null);
     return;
   }
-  const OPENAI_API_URL = process.env.OPENAI_API_URL
+  const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL
     ?? "https://api.openai.com/v1";
-  const kAPI = OPENAI_API_URL + "/audio/speech";
+  const kAPI = OPENAI_BASE_URL + "/audio/speech";
 
   try {
     const response = await axios.post(kAPI, requestPayload, {
