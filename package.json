@@ -42,6 +42,9 @@
     "email": "hello@xbox.work",
     "url": "https://github.com/idootop"
   },
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
