@@ -138,13 +138,13 @@ git clone https://github.com/idootop/mi-gpt-tts.git
 cd mi-gpt-tts
 
 # 安装依赖
-npm install
+pnpm install
 
 # 构建项目
-npm run build
+pnpm run build
 
 # 启动项目
-npm run start
+pnpm run start
 ```
 
 ### 本地调试
