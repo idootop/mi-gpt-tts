@@ -1,11 +1,9 @@
 import { Readable } from "stream";
 
-export const kTTSDefaultText = "你好，很高兴认识你！";
-
 export type TTSBuilder = (
   responseStream: Readable,
-  options?: { text?: string; speaker?: string }
-) => Promise<any>;
+  options: { text: string; speaker: string }
+) => Promise<Uint8Array | undefined>;
 
 export interface TTSSpeaker {
   /**

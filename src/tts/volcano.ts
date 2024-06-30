@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { Readable } from "stream";
 import WebSocket from "ws";
 import * as zlib from "zlib";
-import { TTSProvider, TTSSpeaker, kTTSDefaultText } from "./type";
+import { TTSBuilder, TTSProvider, TTSSpeaker } from "../common/type";
 
 // 火山引擎 TTS 音色列表：https://www.volcengine.com/docs/6561/97465
 const kVolcanoTTSSpeakers: TTSSpeaker[] = [
@@ -415,33 +415,20 @@ const kVolcanoTTSSpeakers: TTSSpeaker[] = [
   },
 ];
 
-export const kVolcanoTTS: TTSProvider = {
-  name: "火山引擎 TTS",
-  tts: volcanoTTS,
-  speakers: kVolcanoTTSSpeakers,
-};
-
 const kAPI = "wss://openspeech.bytedance.com/api/v1/tts/ws_binary";
 const kDefaultHeader: Buffer = Buffer.from([0x11, 0x10, 0x11, 0x00]);
 
-export async function volcanoTTS(
+export const volcanoTTS: TTSBuilder = async (
   responseStream: Readable,
-  options?: { text?: string; speaker?: string }
-) {
-  const { text, speaker: _speaker } = options ?? {};
-  const speaker =
-    kVolcanoTTSSpeakers.find(
-      (e) => e.speaker === _speaker || e.name === _speaker
-    )?.speaker ?? kVolcanoTTSSpeakers[0].speaker;
-
+  { text, speaker }
+) => {
   const request: any = getVolcanoConfig();
-  let requestId: string = randomUUID();
-
   if (!request) {
     return; // 找不到火山引擎 TTS 环境变量
   }
 
-  request.request.text = text || kTTSDefaultText;
+  let requestId: string = randomUUID();
+  request.request.text = text;
   request.request.reqid = requestId;
   request.audio.voice_type = speaker;
   requestId = requestId.substring(0, 8);
@@ -487,7 +474,6 @@ export async function volcanoTTS(
           return;
         }
         if (audioData.length > 0) {
-          // console.log(requestId, "✅ Received audio bytes: ", audioData.length);
           responseStream.push(audioData);
           const newData = new Uint8Array(audioBuffer.length + audioData.length);
           newData.set(audioBuffer, 0);
@@ -515,7 +501,7 @@ export async function volcanoTTS(
       onError(err);
     }
   });
-}
+};
 
 function parseAudioData(requestId: string, responseBuffer: Buffer) {
   const headerSize = responseBuffer[0] & 0x0f;
@@ -577,4 +563,10 @@ const getVolcanoConfig = () => {
       operation: "submit",
     },
   };
+};
+
+export const kVolcanoTTS: TTSProvider = {
+  name: "火山引擎 TTS",
+  tts: volcanoTTS,
+  speakers: kVolcanoTTSSpeakers,
 };

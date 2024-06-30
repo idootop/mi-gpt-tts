@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { streamTTS } from "./tts";
+import { tts } from "./tts";
 
 export default async function handler(request, response) {
   const options: any = {};
@@ -9,8 +9,8 @@ export default async function handler(request, response) {
   }
 
   const audioStream = new Readable({ read() {} });
-
-  streamTTS(audioStream, options).catch(() => {});
+  options.stream = audioStream;
+  tts(options).catch(() => {});
 
   response.writeHead(200, {
     "Transfer-Encoding": "chunked",
