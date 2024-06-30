@@ -1,9 +1,10 @@
 import { Readable } from "stream";
 
-export type TTSBuilder = (
-  responseStream: Readable,
-  options: { text: string; speaker: string }
-) => Promise<Uint8Array | undefined>;
+export type TTSBuilder = (options: {
+  stream: Readable;
+  text: string;
+  speaker: string;
+}) => Promise<Uint8Array | undefined>;
 
 export interface TTSSpeaker {
   /**

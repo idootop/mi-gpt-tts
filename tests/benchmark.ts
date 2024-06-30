@@ -11,7 +11,7 @@ export async function benchmark(options?: {
   const final = await withTimeUsage(async () => {
     for (let i = 0; i < times; i++) {
       const res = await withTimeUsage(async () => {
-        return tts({ text, speaker });
+        return tts({ text, speaker }).catch(() => {});
       });
       if ((res.data?.byteLength ?? 0) > 10) {
         result = res.data;

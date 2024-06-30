@@ -4,7 +4,7 @@ import { CurrentTTSSpeaker, TTSSpeaker } from "./type";
 /**
  * 根据 speaker 标识查找对应的 TTS 音色，支持根据音色名称和标识查找
  */
-export const findSpeakerProvider = (
+export const findTTSProvider = (
   speakerNameOrId?: string
 ): CurrentTTSSpeaker => {
   initDefaultSpeaker();

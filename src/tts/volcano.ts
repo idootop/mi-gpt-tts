@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
-import { Readable } from "stream";
 import WebSocket from "ws";
 import * as zlib from "zlib";
 import { TTSBuilder, TTSProvider, TTSSpeaker } from "../common/type";
+import { createStreamHandler } from "../common/stream";
 
 // 火山引擎 TTS 音色列表：https://www.volcengine.com/docs/6561/97465
 const kVolcanoTTSSpeakers: TTSSpeaker[] = [
@@ -418,10 +418,11 @@ const kVolcanoTTSSpeakers: TTSSpeaker[] = [
 const kAPI = "wss://openspeech.bytedance.com/api/v1/tts/ws_binary";
 const kDefaultHeader: Buffer = Buffer.from([0x11, 0x10, 0x11, 0x00]);
 
-export const volcanoTTS: TTSBuilder = async (
-  responseStream: Readable,
-  { text, speaker }
-) => {
+export const volcanoTTS: TTSBuilder = async ({
+  text,
+  speaker,
+  stream: responseStream,
+}) => {
   const request: any = getVolcanoConfig();
   if (!request) {
     return; // 找不到火山引擎 TTS 环境变量
@@ -443,67 +444,50 @@ export const volcanoTTS: TTSBuilder = async (
     payloadBytes,
   ]);
 
-  const ws = new WebSocket(kAPI, {
-    headers: { Authorization: `Bearer; ${request.app.token}` },
-  });
+  const streamHandler = createStreamHandler(responseStream);
 
-  return new Promise<Uint8Array>((resolve, reject) => {
-    let audioBuffer = new Uint8Array();
+  try {
+    const ws = new WebSocket(kAPI, {
+      headers: { Authorization: `Bearer; ${request.app.token}` },
+    });
 
-    const onError = (err: any) => {
-      console.log(requestId, "❌ Generate failed!");
-      responseStream.push("404");
-      responseStream.push(null);
-      reject();
-    };
-
-    try {
-      ws.on("open", () => {
-        ws.send(fullClientRequest);
-      });
-
-      ws.on("message", (data) => {
-        const responseBuffer = Buffer.from(data as ArrayBuffer);
-        const messageSpecificFlags = responseBuffer[1] & 0x0f;
-        const audioData = parseAudioData(requestId, responseBuffer);
-        if (audioData === "started") {
-          return;
+    ws.on("message", (data) => {
+      const responseBuffer = Buffer.from(data as ArrayBuffer);
+      const messageSpecificFlags = responseBuffer[1] & 0x0f;
+      const audioData = parseAudioData(streamHandler, responseBuffer);
+      if (!audioData || audioData === "started") {
+        return;
+      }
+      if (audioData.length > 0) {
+        streamHandler.push(audioData);
+        if (messageSpecificFlags === 3) {
+          ws.close();
         }
-        if (typeof audioData === "string") {
-          onError(audioData);
-          return;
-        }
-        if (audioData.length > 0) {
-          responseStream.push(audioData);
-          const newData = new Uint8Array(audioBuffer.length + audioData.length);
-          newData.set(audioBuffer, 0);
-          newData.set(audioData, audioBuffer.length);
-          audioBuffer = newData;
-          if (messageSpecificFlags === 3) {
-            console.log(requestId, "✅ Done: ", audioBuffer.length);
-            ws.close();
-          }
-          return;
-        }
-      });
+      }
+    });
 
-      ws.on("error", (err) => {
-        console.log(requestId, "❌ WebSocket error:", err);
-        onError(err);
-      });
+    ws.on("error", (err) => {
+      streamHandler.error(err, "Volcano | WebSocket error");
+    });
 
-      ws.on("close", () => {
-        responseStream.push(null);
-        resolve(audioBuffer);
-      });
-    } catch (err) {
-      console.log(requestId, "❌ Unknown error:", err);
-      onError(err);
-    }
-  });
+    ws.on("close", () => {
+      streamHandler.end();
+    });
+
+    ws.on("open", () => {
+      ws.send(fullClientRequest);
+    });
+  } catch (err) {
+    streamHandler.error(err, "Volcano | Unknown error");
+  }
+
+  return streamHandler.result;
 };
 
-function parseAudioData(requestId: string, responseBuffer: Buffer) {
+function parseAudioData(
+  streamHandler: ReturnType<typeof createStreamHandler>,
+  responseBuffer: Buffer
+) {
   const headerSize = responseBuffer[0] & 0x0f;
   const messageType = responseBuffer[1] >> 4;
   const messageSpecificFlags = responseBuffer[1] & 0x0f;
@@ -524,15 +508,12 @@ function parseAudioData(requestId: string, responseBuffer: Buffer) {
     if (messageCompression === 1) {
       errorMessage = zlib.gunzipSync(errorMessage);
     }
-    console.log(requestId, `❌ Error code: ${errorCode}`);
-    console.log(
-      requestId,
-      `❌ Error message: ${errorMessage.toString("utf-8")}`
+    streamHandler.error(
+      String(errorMessage),
+      `Volcano | Error code: ${errorCode}`
     );
-    return "error";
   } else {
-    console.log(requestId, "❌ Unknown message");
-    return "unknown";
+    streamHandler.error("Unknown", `Message`);
   }
 }
 

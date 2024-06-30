@@ -1,9 +1,9 @@
 // TTS 代码参考自：https://github.com/CodeF53/edge-tts/blob/main/index.ts
 
 import { randomUUID } from "crypto";
-import { Readable } from "stream";
 import WebSocket from "ws";
 import { TTSBuilder, TTSProvider, TTSSpeaker } from "../common/type";
+import { createStreamHandler } from "../common/stream";
 
 // 微软必应 Read Aloud 音色列表：
 // https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/voices/list?trustedclienttoken=${your-trust-token}
@@ -68,97 +68,75 @@ const kEdgeTTSSpeakers: TTSSpeaker[] = [
 const kAPI =
   "wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1";
 
-export const edgeTTS: TTSBuilder = async (
-  responseStream: Readable,
-  { text, speaker }
-) => {
-  const { EDGE_TTS_TRUSTED_TOKEN: token, EDGE_TTS_EXTENSION_ID: extensionId } =
-    process.env;
-  if (!token || !extensionId) {
-    console.log(
-      "❌ 找不到微软必应 TTS 环境变量：EDGE_TTS_EXTENSION_ID, EDGE_TTS_TRUSTED_TOKEN"
-    );
+export const edgeTTS: TTSBuilder = async ({
+  text,
+  speaker,
+  stream: responseStream,
+}) => {
+  const { EDGE_TTS_TRUSTED_TOKEN: token } = process.env;
+  if (!token) {
+    console.log("❌ 找不到微软必应 TTS 环境变量：EDGE_TTS_TRUSTED_TOKEN");
     return;
   }
 
-  let requestId: string = randomUUID();
-  const ws = new WebSocket(
-    `${kAPI}?TrustedClientToken=${token}&ConnectionId=${requestId}`,
-    {
-      host: "speech.platform.bing.com",
-      origin: `chrome-extension://${extensionId}`,
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.66 Safari/537.36 Edg/103.0.1264.44",
-      },
-    }
-  );
-  requestId = requestId.substring(0, 8);
+  const streamHandler = createStreamHandler(responseStream);
 
-  const request = getEdgeTTSMessages({ text, speaker });
-  return new Promise<Uint8Array>((resolve, reject) => {
-    let audioBuffer = new Uint8Array();
+  try {
+    const ws = new WebSocket(
+      `${kAPI}?TrustedClientToken=${token}&ConnectionId=${randomUUID()}`,
+      {
+        host: "speech.platform.bing.com",
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.66 Safari/537.36 Edg/103.0.1264.44",
+        },
+      }
+    );
 
-    const onError = (err: any) => {
-      console.log(requestId, "❌ Generate failed!");
-      responseStream.push("404");
-      responseStream.push(null);
-      reject();
-    };
-
-    try {
-      ws.on("open", () =>
-        ws.send(request.config, { compress: true }, (configError) => {
-          if (configError) {
-            console.log(requestId, "❌ Send config msg failed!", configError);
-            onError(configError);
-            return;
-          }
-          ws.send(request.ssml, { compress: true }, (ssmlError) => {
-            if (ssmlError) {
-              console.log(requestId, "❌ Send ssml msg failed!", ssmlError);
-              onError(ssmlError);
-            }
-          });
-        })
+    ws.on("message", (rawData: Buffer, isBinary) => {
+      if (!isBinary) {
+        const data = rawData.toString("utf8");
+        if (data.includes("turn.end")) {
+          ws.close();
+        }
+        return;
+      }
+      const separator = "Path:audio\r\n";
+      const audioData = rawData.subarray(
+        rawData.indexOf(separator) + separator.length
       );
+      if (audioData.length > 0) {
+        streamHandler.push(audioData);
+      }
+    });
 
-      ws.on("message", (rawData: Buffer, isBinary) => {
-        if (!isBinary) {
-          const data = rawData.toString("utf8");
-          if (data.includes("turn.end")) {
-            console.log(requestId, "✅ Done: ", audioBuffer.length);
-            ws.close();
-          }
+    ws.on("error", (err) => {
+      streamHandler.error(err, "Edge | WebSocket error");
+    });
+
+    ws.on("close", () => {
+      streamHandler.end();
+    });
+
+    ws.on("open", () => {
+      const request = getEdgeTTSMessages({ text, speaker });
+      ws.send(request.config, { compress: true }, (configError) => {
+        if (configError) {
+          streamHandler.error(configError, "Edge | Send config msg failed!");
           return;
         }
-        const separator = "Path:audio\r\n";
-        const audioData = rawData.subarray(
-          rawData.indexOf(separator) + separator.length
-        );
-        if (audioData.length > 0) {
-          responseStream.push(audioData);
-          const newData = new Uint8Array(audioBuffer.length + audioData.length);
-          newData.set(audioBuffer, 0);
-          newData.set(audioData, audioBuffer.length);
-          audioBuffer = newData;
-        }
+        ws.send(request.ssml, { compress: true }, (ssmlError) => {
+          if (ssmlError) {
+            streamHandler.error(ssmlError, "Edge | Send ssml msg failed!");
+          }
+        });
       });
+    });
+  } catch (err) {
+    streamHandler.error(err, "Edge | Unknown error");
+  }
 
-      ws.on("error", (err) => {
-        console.log(requestId, "❌ WebSocket error:", err);
-        onError(err);
-      });
-
-      ws.on("close", () => {
-        responseStream.push(null);
-        resolve(audioBuffer);
-      });
-    } catch (err) {
-      console.log(requestId, "❌ Unknown error:", err);
-      onError(err);
-    }
-  });
+  return streamHandler.result;
 };
 
 function getEdgeTTSMessages(options: {
