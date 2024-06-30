@@ -8,4 +8,4 @@
 !package.json
 !tsconfig.json
 !tsup.config.ts
-!package-lock.json
+!pnpm-lock.yaml

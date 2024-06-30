@@ -1,11 +1,10 @@
-import { volcanoTTS } from "@/src/tts/volcano";
 import { writeFile } from "fs/promises";
-import { Readable } from "stream";
+import { benchmark } from "./benchmark";
 
 async function main() {
-  const audioStream = new Readable({ read() {} });
-  const audioBuffer = await volcanoTTS(audioStream, {
-    text: "你好，很高兴认识你。",
+  const audioBuffer = await benchmark({
+    times: 1,
+    speaker: "云希",
   });
   if (audioBuffer) {
     await writeFile("test.mp3", audioBuffer);

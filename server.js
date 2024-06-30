@@ -37,5 +37,7 @@ const server = http.createServer((req, res) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`MiGPT-TTS is running on port ${PORT}\n`);
+  console.log("version: v2.0.0  by: del.wang\n");
+  console.log("✅ 服务已启动...\n");
 });

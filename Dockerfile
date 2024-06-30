@@ -8,18 +8,20 @@ WORKDIR /app
 FROM base as runtime
 COPY . .
 RUN --mount=type=cache,target=/root/.npm \
-    npm install --production
+    npm install -g pnpm@9.4.0
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --production
 
 FROM runtime as dist
 RUN --mount=type=cache,target=/root/.npm \
-    npm install && npm run build
+    pnpm install && pnpm run build
 
 FROM base as release
 
 COPY server.js .
 COPY package.json .
 COPY public ./public
-COPY package-lock.json .
+COPY pnpm-lock.yaml .
 COPY --from=dist /app/api ./api
 COPY --from=runtime /app/node_modules ./node_modules
 
