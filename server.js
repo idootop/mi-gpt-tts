@@ -39,5 +39,5 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}\n`);
   console.log("version: v1.3.0  by: del.wang\n");
-  console.log("✅ 服务已启动...");
+  console.log("✅ 服务已启动...\n");
 });

@@ -1,5 +1,6 @@
 import { TTSBuilder, TTSProvider, TTSSpeaker } from "../common/type";
 import { createStreamHandler } from "../common/stream";
+import { fetch } from "node-fetch-native/proxy";
 
 // OpenAI TTS 音色列表：https://platform.openai.com/docs/guides/text-to-speech
 const kOpenAISpeakers: TTSSpeaker[] = [

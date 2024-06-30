@@ -8,10 +8,11 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "npm run build && npm run start",
+    "dev": "pnpm build && pnpm start",
     "start": "node --env-file=.env server.js"
   },
   "dependencies": {
+    "node-fetch-native": "^1.6.4",
     "ws": "^8.14.2"
   },
   "devDependencies": {
