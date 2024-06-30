@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "pnpm build && pnpm start",
-    "publish": "tsup --config tsup.config.npm.ts && npm publish",
+    "release": "tsup --config tsup.config.npm.ts && npm publish",
     "start": "node --env-file=.env server.js"
   },
   "dependencies": {
