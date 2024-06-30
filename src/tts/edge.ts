@@ -69,11 +69,12 @@ const kAPI =
   "wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1";
 
 export const edgeTTS: TTSBuilder = async ({
+  edge,
   text,
   speaker,
   stream: responseStream,
 }) => {
-  const { EDGE_TTS_TRUSTED_TOKEN: token } = process.env;
+  const token = edge?.trustedToken ?? process.env.EDGE_TTS_TRUSTED_TOKEN;
   if (!token) {
     console.log("❌ 找不到微软必应 TTS 环境变量：EDGE_TTS_TRUSTED_TOKEN");
     return;

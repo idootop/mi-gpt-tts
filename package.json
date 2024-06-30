@@ -2,13 +2,33 @@
   "name": "mi-gpt-tts",
   "version": "1.3.0",
   "type": "module",
-  "private": true,
+  "description": "适用于 MiGPT 的 TTS 模块，支持流式响应，支持火山引擎、微软必应、OpenAI 等 TTS 服务。",
+  "homepage": "https://github.com/idootop/mi-gpt-tts",
+  "bugs": "https://github.com/idootop/mi-gpt-tts/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idootop/mi-gpt-tts.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Del Wang",
+    "email": "hello@xbox.work",
+    "url": "https://github.com/idootop"
+  },
+  "keywords": [
+    "tts",
+    "stream",
+    "mi-gpt",
+    "edge-tts",
+    "volcano-tts"
+  ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "build": "tsup",
     "dev": "pnpm build && pnpm start",
+    "publish": "tsup --config tsup.config.npm.ts && npm publish",
     "start": "node --env-file=.env server.js"
   },
   "dependencies": {

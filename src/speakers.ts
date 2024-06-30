@@ -1,4 +1,4 @@
-import { kTTSSpeakers } from "@/src/tts";
+import { kTTSSpeakers } from "@/src";
 
 export default async function handler(request, response) {
   response.writeHead(200, {

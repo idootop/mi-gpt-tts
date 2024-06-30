@@ -1,4 +1,4 @@
-import { tts } from "@/src/tts";
+import { tts } from "@/src";
 
 export async function benchmark(options?: {
   speaker?: string;

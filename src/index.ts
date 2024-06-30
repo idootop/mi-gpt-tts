@@ -1,10 +1,12 @@
 import { Readable } from "stream";
-import { kTTSDefaultText } from "../common/const";
-import { findTTSProvider } from "../common/speaker";
-import { TTSProvider, TTSSpeaker } from "../common/type";
-import { kEdgeTTS } from "./edge";
-import { kOpenAI } from "./openai";
-import { kVolcanoTTS } from "./volcano";
+import { kTTSDefaultText } from "./common/const";
+import { findTTSProvider } from "./common/speaker";
+import { TTSConfig, TTSProvider, TTSSpeaker } from "./common/type";
+import { kEdgeTTS } from "./tts/edge";
+import { kOpenAI } from "./tts/openai";
+import { kVolcanoTTS } from "./tts/volcano";
+
+export type { TTSConfig } from "./common/type";
 
 /**
  * 此处注册 TTS 服务提供商
@@ -20,15 +22,18 @@ export const kTTSSpeakers = kTTSProviders.reduce(
   [] as TTSSpeaker[]
 );
 
-export async function tts(options: {
-  stream?: Readable;
-  text?: string;
-  speaker?: string;
-}) {
-  const { text, speaker, stream } = options;
-  const service = findTTSProvider(speaker);
-  return service.tts({
-    speaker: service.speaker,
+export async function tts(
+  options: TTSConfig & {
+    stream?: Readable;
+    text?: string;
+    speaker?: string;
+  }
+) {
+  const { text, speaker, stream, ...rest } = options;
+  const provider = findTTSProvider(speaker);
+  return provider.tts({
+    ...rest,
+    speaker: provider.speaker,
     text: text || kTTSDefaultText,
     stream: stream || new Readable({ read() {} }),
   });

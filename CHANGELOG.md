@@ -2,6 +2,7 @@
 
 - 支持微软必应 TTS
 - 支持 OpenAI TTS
+- 发布 NPM Package
 - 支持网络请求 Proxy
 - 添加语音合成 Benchmark
 

@@ -1,4 +1,4 @@
-import { kTTSProviders } from "../tts";
+import { kTTSProviders } from "..";
 import { CurrentTTSSpeaker, TTSSpeaker } from "./type";
 
 /**

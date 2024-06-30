@@ -1,10 +1,34 @@
 import { Readable } from "stream";
 
-export type TTSBuilder = (options: {
-  stream: Readable;
-  text: string;
-  speaker: string;
-}) => Promise<Uint8Array | undefined>;
+export interface VolcanoConfig {
+  appId?: string;
+  accessToken?: string;
+  userId?: string;
+}
+
+export interface EdgeConfig {
+  trustedToken?: string;
+}
+
+export interface OpenAIConfig {
+  apiKey: string;
+  model?: string;
+  baseUrl?: string;
+}
+
+export interface TTSConfig {
+  volcano?: VolcanoConfig;
+  edge?: EdgeConfig;
+  openai?: OpenAIConfig;
+}
+
+export type TTSBuilder = (
+  options: TTSConfig & {
+    stream: Readable;
+    text: string;
+    speaker: string;
+  }
+) => Promise<Uint8Array | undefined>;
 
 export interface TTSSpeaker {
   /**

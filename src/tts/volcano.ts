@@ -1,8 +1,13 @@
 import { randomUUID } from "crypto";
 import WebSocket from "ws";
 import * as zlib from "zlib";
-import { TTSBuilder, TTSProvider, TTSSpeaker } from "../common/type";
 import { createStreamHandler } from "../common/stream";
+import {
+  TTSBuilder,
+  TTSProvider,
+  TTSSpeaker,
+  VolcanoConfig,
+} from "../common/type";
 
 // 火山引擎 TTS 音色列表：https://www.volcengine.com/docs/6561/97465
 const kVolcanoTTSSpeakers: TTSSpeaker[] = [
@@ -419,11 +424,12 @@ const kAPI = "wss://openspeech.bytedance.com/api/v1/tts/ws_binary";
 const kDefaultHeader: Buffer = Buffer.from([0x11, 0x10, 0x11, 0x00]);
 
 export const volcanoTTS: TTSBuilder = async ({
+  volcano,
   text,
   speaker,
   stream: responseStream,
 }) => {
-  const request: any = getVolcanoConfig();
+  const request: any = getVolcanoConfig(volcano);
   if (!request) {
     return; // 找不到火山引擎 TTS 环境变量
   }
@@ -517,11 +523,11 @@ function parseAudioData(
   }
 }
 
-const getVolcanoConfig = () => {
-  if (
-    !process.env.VOLCANO_TTS_APP_ID ||
-    !process.env.VOLCANO_TTS_ACCESS_TOKEN
-  ) {
+const getVolcanoConfig = (volcano?: VolcanoConfig) => {
+  const appid = volcano?.appId ?? process.env.VOLCANO_TTS_APP_ID;
+  const token = volcano?.accessToken ?? process.env.VOLCANO_TTS_ACCESS_TOKEN;
+  const uid = volcano?.userId ?? process.env.VOLCANO_TTS_USER_ID ?? "666";
+  if (!appid || !token) {
     console.log(
       "❌ 找不到火山引擎 TTS 环境变量：VOLCANO_TTS_APP_ID、VOLCANO_TTS_ACCESS_TOKEN"
     );
@@ -529,12 +535,12 @@ const getVolcanoConfig = () => {
   }
   return {
     app: {
-      appid: process.env.VOLCANO_TTS_APP_ID,
-      token: process.env.VOLCANO_TTS_ACCESS_TOKEN,
+      appid,
+      token,
       cluster: "volcano_tts",
     },
     user: {
-      uid: process.env.VOLCANO_TTS_USER_ID ?? "666",
+      uid,
     },
     audio: {
       encoding: "mp3",

@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { tts } from "./tts";
+import { tts } from ".";
 
 export default async function handler(request, response) {
   const options: any = {};
