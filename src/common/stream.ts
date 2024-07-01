@@ -27,7 +27,7 @@ export const createStreamHandler = (responseStream: Readable) => {
 
   const error = (err: any, msg = "Something went wrong") => {
     console.log(requestId, "❌ " + msg, err);
-    responseStream.push("404");
+    responseStream.push("error");
     responseStream.push(null);
     reject();
   };

@@ -1,18 +1,32 @@
 import http from "http";
 import apiSpeakers from "./api/speakers.js";
 import apiTTS from "./api/tts.mp3.js";
-import { createReadStream, statSync } from "fs";
+import { createReadStream, readFileSync, statSync } from "fs";
+import { randomUUID } from "crypto";
 
-const exists = (path) => {
-  try {
-    return statSync(path).isFile();
-  } catch (e) {
-    return false;
-  }
-};
+const kPort = process.env.PORT || 3000;
+const kVersion = JSON.parse(readFileSync("package.json")).version;
+const kSecretPath = process.env.SECRET_PATH || randomUUID().substring(0, 8);
 
 const server = http.createServer((req, res) => {
-  req.url = req.url.replace("+text=", "&text="); // 修正请求 URL
+  // 返回提示字符串
+  const response = (msg) => {
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end(Buffer.from(msg, "utf8"));
+  };
+
+  // 修正请求 URL 中的转义字符
+  req.url = req.url.replace("+text=", "&text=");
+
+  // 校验 secret path
+  const secretPath = req.url.split("/")[1];
+  if (secretPath !== kSecretPath) {
+    console.log("❌ 非法请求" + decodeURI(req.url));
+    return response("❌ 非法请求");
+  }
+
+  // 解析原始请求 URL
+  req.url = req.url.split(kSecretPath)[1];
   const { pathname } = new URL("http://127.0.0.1" + req.url);
   const filePath = `public${pathname}`;
 
@@ -30,14 +44,24 @@ const server = http.createServer((req, res) => {
     const readStream = createReadStream(filePath);
     readStream.pipe(res);
   } else {
-    res.writeHead(404, { "Content-Type": "text/plain" });
-    res.end("404");
+    response("✅ 服务已启动");
   }
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`MiGPT-TTS is running on port ${PORT}\n`);
-  console.log("version: v2.0.0  by: del.wang\n");
-  console.log("✅ 服务已启动...\n");
+server.listen(kPort, () => {
+  console.log(
+    [
+      `MiGPT-TTS: v${kVersion}  by: del.wang`,
+      `接口地址: http://localhost:${kPort}/${kSecretPath}/api`,
+      "✅ 服务已启动...\n",
+    ].join("\n\n")
+  );
 });
+
+function exists(path) {
+  try {
+    return statSync(path).isFile();
+  } catch (e) {
+    return false;
+  }
+}

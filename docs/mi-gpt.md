@@ -25,25 +25,39 @@
 
 然后，将里面的环境变量修改成你自己的，参数含义如下：
 
-| 环境变量名称               | 描述                                                                                                | 示例              |
-| -------------------------- | --------------------------------------------------------------------------------------------------- | ----------------- |
-| `VOLCANO_TTS_APP_ID`       | 火山引擎语音合成 APP ID                                                                             | `123456`          |
-| `VOLCANO_TTS_ACCESS_TOKEN` | 火山引擎语音合成 Access Token                                                                       | `xxxxxx`          |
-| `TTS_DEFAULT_SPEAKER`      | 默认音色名称或 ID（可选，查看完整[音色列表](https://www.volcengine.com/docs/6561/97465)和费用详情） | `BV700_streaming` |
+| 环境变量名称               | 描述                                                                                                | 示例                            |
+| -------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `VOLCANO_TTS_APP_ID`       | 火山引擎语音合成 APP ID                                                                             | `123456`                        |
+| `VOLCANO_TTS_ACCESS_TOKEN` | 火山引擎语音合成 Access Token                                                                       | `xxxxxx`                        |
+| `SECRET_PATH`              | 访问秘密路径，相当于访问密码。推荐长度大于 6，由字母、数字、- 和 \_ 组成，为空时每次启动随机生成    | `Are-You-OK` (不要直接用这个！) |
+| `TTS_DEFAULT_SPEAKER`      | 默认音色名称或 ID（可选，查看完整[音色列表](https://www.volcengine.com/docs/6561/97465)和费用详情） | `BV700_streaming`               |
+
+> 注意：出于安全考虑，从 v3.0.0 版本开始，访问语音合成接口需要带上 `SECRET_PATH` 防止他人盗刷接口。
+> 如果 `SECRET_PATH` 环境变量为空，每次启动服务则会生成随机访问密码。
 
 ### 3. 部署 MiGPT-TTS 服务
 
-考虑到国内网络访问 [Vercel](https://vercel.com) 并不友好，此处仅提供 Docker 部署方式。
-
 [![Docker Image Version](https://img.shields.io/docker/v/idootop/mi-gpt-tts?color=%23086DCD&label=docker%20image)](https://hub.docker.com/r/idootop/mi-gpt-tts)
+
+环境变量配置完成后，请在对应目录运行以下命令，启动服务：
 
 ```shell
 docker run -d --env-file $(pwd)/.env -p 4321:3000 idootop/mi-gpt-tts:latest
 ```
 
-启动成功后，访问 `http://[你的公网/局域网地址]:4321/api/tts.mp3` 即可查看语音合成效果。
+启动成功后，可在控制台的日志输出中查看接口地址，比如：
 
-> 注意：如果你是通过 Node.js 本地启动本项目，则默认服务端口为 `3000`。
+```shell
+MiGPT-TTS: v3.0.0  by: del.wang
+
+接口地址：http://localhost:3000/7a0e9f21/api
+
+✅ 服务已启动...
+```
+
+访问 `http://[IP]:[PORT]/[SECRET_PATH]/api/tts.mp3` 即可查看语音合成效果。
+
+> 注意：这里的端口（PORT）是你为 Docker 分配的实际端口，不推荐使用默认的 4321 端口。如果你是通过 Node.js 本地启动本项目，则默认端口为 `3000`。
 
 ### 4. 修改 MiGPT 默认 TTS 引擎
 
@@ -54,7 +68,7 @@ docker run -d --env-file $(pwd)/.env -p 4321:3000 idootop/mi-gpt-tts:latest
 
 ```js
 // mi-gpt/.env
-TTS_BASE_URL=http://[你的公网/局域网地址]:[端口号]/api
+TTS_BASE_URL=http://[IP]:[PORT]/[SECRET_PATH]/api
 
 // mi-gpt/.migpt.js
 export default {
@@ -76,8 +90,8 @@ export default {
 
 ```shell
 # mi-gpt/.env
-AUDIO_SILENT=http://[你的公网/局域网地址]:[端口号]/slient.wav
-AUDIO_BEEP=http://[你的公网/局域网地址]:[端口号]/beep.wav
-AUDIO_ACTIVE=http://[你的公网/局域网地址]:[端口号]/active.wav
-AUDIO_ERROR=http://[你的公网/局域网地址]:[端口号]/error.wav
+AUDIO_SILENT=http://[IP]:[PORT]/[SECRET_PATH]/slient.wav
+AUDIO_BEEP=http://[IP]:[PORT]/[SECRET_PATH]/beep.wav
+AUDIO_ACTIVE=http://[IP]:[PORT]/[SECRET_PATH]/active.wav
+AUDIO_ERROR=http://[IP]:[PORT]/[SECRET_PATH]/error.wav
 ```
