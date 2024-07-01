@@ -1,6 +1,6 @@
 {
   "name": "mi-gpt-tts",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "type": "module",
   "license": "MIT",
   "description": "适用于 MiGPT 的 TTS 模块，支持火山引擎、微软必应、OpenAI 等 TTS 服务。",
