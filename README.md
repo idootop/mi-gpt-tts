@@ -58,6 +58,16 @@ async function main() {
 main();
 ```
 
+## 🔊 音色列表
+
+当前支持的完整音色列表和音色名称，可在以下列表中查询：
+
+- [火山引擎](https://github.com/idootop/mi-gpt-tts/blob/main/src/tts/volcano.ts)
+- [微软必应](https://github.com/idootop/mi-gpt-tts/blob/main/src/tts/edge.ts)
+- [OpenAI](https://github.com/idootop/mi-gpt-tts/blob/main/src/tts/openai.ts)
+
+> 注意：列表中不存在的音色，无法直接使用。请提 PR 或自行修改代码添加额外的音色。
+
 ## 📖 使用文档
 
 以下为更详细的使用教程，大多数问题都可在 [💬 常见问题](https://github.com/idootop/mi-gpt-tts/blob/main/docs/faq.md) 中找到答案。
