@@ -21,7 +21,7 @@ const server = http.createServer((req, res) => {
   // 校验 secret path
   const secretPath = req.url.split("/")[1];
   if (secretPath !== kSecretPath) {
-    console.log("❌ 非法请求" + decodeURI(req.url));
+    console.log("❌ 非法请求: " + req.url);
     return response("❌ 非法请求");
   }
 
@@ -30,7 +30,13 @@ const server = http.createServer((req, res) => {
   const { pathname } = new URL("http://127.0.0.1" + req.url);
   const filePath = `public${pathname}`;
 
-  console.log("🔥 " + decodeURI(req.url));
+  let uri = withCatch(() => decodeURI(req.url));
+  if (!uri) {
+    console.log("❌ 请求路径解析异常: " + req.url);
+    return response("❌ 请求路径解析异常");
+  }
+  
+  console.log("🔥 " + uri);
 
   if (pathname.startsWith("/api/speakers")) {
     apiSpeakers(req, res);
@@ -63,5 +69,13 @@ function exists(path) {
     return statSync(path).isFile();
   } catch (e) {
     return false;
+  }
+}
+
+function withCatch(task, onError) {
+  try {
+    return task();
+  } catch (error) {
+    return onError?.(error);
   }
 }
